@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Indian Railway Coach Inspection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom font for better aesthetics */
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #fdbf6f; /* Light Orange for body */
+    }
+    .form-container {
+      background-color: #87ceeb; /* Sea Blue for form page */
+      position: relative; /* Needed for absolute positioning of watermark */
+    }
+    /* Watermark style */
+    .watermark {
+      position: absolute;
+      bottom: 2px;
+      left: 10px;
+      font-size: 1.03rem; /* Smaller text */
+      color: rgba(0, 0, 0, .5); /* Semi-transparent red */
+      pointer-events: none; /* Allows clicks to pass through */
+      white-space: nowrap; /* Prevents text wrapping */
+    }
+    .w-short {
+        width: 100%;
+    }
+    @media (min-width: 640px) {
+        .w-short {
+            width: 50%;
+        }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+  <header class="w-full max-w-3xl bg-red-700 text-white py-4 px-6 rounded-t-lg shadow-md mb-4 flex items-center justify-center">
+    <img src="https://upload.wikimedia.org/wikipedia/hi/7/7b/Indian_Railways_logo.png" alt="Indian Railways Logo" class="h-16 w-16 mr-4">
+    <div>
+      <h1 class="text-3xl font-extrabold text-center">INDIAN RAILWAY</h1>
+      <p class="text-center text-sm mt-1">Coach Maintenance and Inspection Santaragachi</p>
+    </div>
+  </header>
+  <section class="form-container p-8 rounded-b-lg shadow-xl w-full max-w-3xl border border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Train Coach Maintenance and Inspection Report</h2>
+    <form id="entryForm" class="space-y-4">
+      <input type="hidden" id="rowIndex" name="rowIndex">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="coachInput" class="block text-gray-700 font-medium mb-1">Coach:</label>
+          <div class="flex">
+            <input type="number" name="coach" id="coachInput" required class="flex-1 px-4 py-2 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="button" onclick="fetchLatestEntry()" class="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+  </svg>
+</button>
+          </div>
+        </div>
+        <div>
+          <label for="dateInput" class="block text-gray-700 font-medium mb-1">Date:</label>
+          <input type="date" name="date" id="dateInput" required class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+<div id="latestInfo1" class="mt-4 text-center text-gray-600 font-italic" style="color: red;"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="trainInput" class="block text-gray-700 font-medium mb-1">Train:</label>
+          <input type="number" name="train" id="trainInput" required class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label for="useridInput" class="block text-gray-700 font-medium mb-1">USER ID:</label>
+          <input type="text" name="userid" id="useridInput" required class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label for="coachtypeInput" class="block text-gray-700 font-medium mb-1">COACH TYPE:</label>
+          <select name="coachtype" id="coachtypeInput" required class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select Coach Type</option>
+            <option value="lwcbac">LWCBAC (Pantry Car)</option>
+            <option value="lwaccn">LWACCN</option>
+            <option value="lwaccw">LWACCW</option>
+            <option value="lwfac">LWFAC (First AC)</option>
+            <option value="lwlrrm">LWLRRM (Power Car)</option>
+            <option value="lslrd">LSLRD (SLR with Luggage & Guard)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label for="arrivalreportInput" class="block text-gray-700 font-medium mb-1">ARRIVAL REPORT</label>
+        <textarea id="arrivalreportInput" name="arrivalreport" rows="3" placeholder="Please fill arrival report of coach..." class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+      </div>
+      <div>
+        <label for="actiontakenInput" class="block text-gray-700 font-medium mb-1">ACTION TAKEN</label>
+        <textarea id="actiontakenInput" name="actiontaken" rows="3" placeholder="Please fill work done..." class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+      </div>
+
+      <div id="groupDFields" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 conditional-field">
+        <div>
+          <label for="k01Input" class="block text-gray-700 font-medium mb-1">K01:</label>
+          <select name="k01" id="k01Input" class="w-full  px-4 py-2  p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="k02Input" class="block text-gray-700 font-medium mb-1">K02:</label>
+          <select name="k02" id="k02Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ 			<option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+     
+   </div>
+        <div>
+          <label for="k44Input" class="block text-gray-700 font-medium mb-1">K44:</label>
+          <select name="k44" id="k44Input" class="w-full  px-4 py-2  p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+       
+ </div>
+        <div>
+          <label for="fuse125aInput" class="block text-gray-700 font-medium mb-1">FUSE 125A:</label>
+          <select name="fuse125a" id="fuse125aInput" class="w-full  px-4 py-2  p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="Rewired by fuse wire material o/s">FUSE WIRE</option>
+                    </select>
+        </div>
+        <div>
+          <label for="fuse100aInput" class="block text-gray-700 font-medium mb-1">FUSE 100A:</label>
+          <select name="fuse100a" id="fuse100aInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="Rewired by fuse wire material o/s">FUSE WIRE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="rbcebcInput" class="block text-gray-700 font-medium mb-1">RBC&EBC:</label>
+          <select name="rbcebc" id="rbcebcInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="both ebc OK"> BOTH EBC OK</option>
+                        <option value="01 ebc ok">01 EBC OK</option>
+                        <option value="both ebc defective">BOTH EBC DEF</option>
+                        <option value="U/S combined ok">U/S COMBINED OK</option>
+                        <option value="U/S ebc ok">U/S EBC OK</option>
+                        <option value="U/S combined defective">U/S COMBINED DEF</option>
+                    </select>
+                       
+ </div>
+        <div>
+          <label for="ductInput" class="block text-gray-700 font-medium mb-1">DUCT:</label>
+          <select name="duct" id="ductInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select TYPE</option>
+                        <option value="META">META</option>
+                        <option value="CANAVS">CANVAS</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="ductstatusInput" class="block text-gray-700 font-medium mb-1">DUCT STATUS:</label>
+          <select name="ductstatus" id="ductstatusInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="TORN">TORN</option>
+                        <option value="1 SUPPPLY REPAIRED">1 SUPPPLY REPAIRED</option>
+                        <option value="BOTH SUPPPLY REPAIRED">BOTH SUPPPLY REPAIRED</option>
+                        <option value="1 RETURN REPAIRED">1 RETURN REPAIRED</option>
+                        <option value="02 RETURN REPAIRED">02 RETURN REPAIRED</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="mmrInput" class="block text-gray-700 font-medium mb-1">MMR:</label>
+          <select name="mmr" id="mmrInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="BOTH OK"> BOTH OK</option>
+                        <option value="1 DEFECTIVE">1 DEFECTIVE</option>
+                        <option value="BOTH DEFECTIVE">BOTH DEFECTIVE</option>
+                    </select>
+
+        </div>
+      </div>
+
+      <div id="groupAFields" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 conditional-field">
+        <div>
+          <label for="k46Input" class="block text-gray-700 font-medium mb-1">K46:</label>
+          <select name="k46" id="k46Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+        </div>
+        <div>
+          <label for="hotcaseInput" class="block text-gray-700 font-medium mb-1">HOT CASE:</label>
+          <select name="hotcase" id="hotcaseInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+       
+ <option value="ALL OK">ALL OK</option>
+                        <option value="1 DEFECTIVE">1 DEFECTIVE</option>
+                        <option value="2 DEFECTIVE">2 DEFECTIVE</option>
+                        <option value="ALL DEFECTIVE">ALL DEFECTIVE</option>
+                        <option value="DOOR DEFICIENT">DOOR DEFICIENT</option>
+                    </select>
+ </div>
+        <div>
+          <label for="fridgeInput" class="block text-gray-700 font-medium mb-1">FRIDGE:</label>
+          <select name="fridge" id="fridgeInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+	 <option value="DEFECTIVE">DEFECTIVE</option>
+                        <option value="OK">OK</option>
+                        <option value="DOOR DEFICIENT">DOOR DEFICIENT</option>
+                        <option value="DEFICIENT">DEFICIENT</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="deepfridgeInput" class="block text-gray-700 font-medium mb-1">DEEP FRIDGE:</label>
+          <select name="deepfridge" id="deepfridgeInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="bottlecoolerInput" class="block text-gray-700 font-medium mb-1">BOTTLE COOLER:</label>
+          <select name="bottlecooler" id="bottlecoolerInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="boilerInput" class="block text-gray-700 font-medium mb-1">BOILER:</label>
+          <select name="boiler" id="boilerInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="OK">OK</option>
+                        <option value="1 DEFECTIVE">1 DEFECTIVE</option>
+                        <option value="2 DEFECTIVE">2 DEFECTIVE</option>
+                        <option value="ALL DEFECTIVE">ALL DEFECTIVE</option>
+                    </select>
+        </div>
+        <div>
+          <label for="insectkillerInput" class="block text-gray-700 font-medium mb-1">INSECT KILLER:</label>
+          <select name="insectkiller" id="insectkillerInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="BOTH OK">BOTH OK</option>
+                        <option value="01 DEFECTIVE">01 DEFECTIVE</option>
+                        <option value="01 DEFECTIVE & 01 DEFICIENT">01 DEFECTIVE & 01 DEFICIENT</option>
+                        <option value="BOTH DEFECTIVE">BOTH DEFECTIVE</option>
+                        <option value="BOTH DEFICIENT">BOTH DEFICIENT</option>
+
+                    </select>
+
+        </div>
+        <div>
+          <label for="chimneyInput" class="block text-gray-700 font-medium mb-1">CHIMNEY:</label>
+          <select name="chimney" id="chimneyInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="ALL OK">ALL OK</option>
+                        <option value="01 DEFECTIVE">01 DEFECTIVE</option>
+                        <option value="02 DEFECTIVE">02 DEFECTIVE</option>
+                        <option value="ALL DEFECTIVE">ALL DEFECTIVE</option>
+                       
+                    </select>
+
+        </div>
+        <div>
+          <label for="chimneyfilterInput" class="block text-gray-700 font-medium mb-1">CHIMNEY FILTER:</label>
+          <select name="chimneyfilter" id="chimneyfilterInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Status</option>
+                        <option value="CLEANED">CLEANED</option>
+                        <option value="CHOCKED">CHOCKED</option>
+                        <option value="1 DEFICIENT">1 DEFICIENT</option>
+                        <option value="2 DEFICIENT">2 DEFICIENT</option>
+                        <option value="ALL DEFICIENT">ALL DEFICIENT</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="fdsspantryInput" class="block text-gray-700 font-medium mb-1">FDSS Pantry:</label>
+          <select name="fdsspantry" id="fdsspantryInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="AVAILABLE AND PRESSURE OK">AVAILABLE AND PRESSURE</option>
+                        <option value="AVAILABLE BUT LOW PRESSURE">AVAILABLE BUT LOW PRESSURE</option>
+                        <option value="NOT AVAILABLE">NOT AVAILABLE</option>
+                    </select>
+        </div>
+        <div>
+          <label for="pantrypanelmcbInput" class="block text-gray-700 font-medium mb-1">Pantry Panel MCB:</label>
+          <select name="pantrypanelmcb" id="pantrypanelmcbInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="OK">OK</option>
+                        <option value="01 16A DEFECTIVE">01 16A DEFECTIVE</option>
+                        <option value="01 20A DEFECTIVE">01 20A DEFECTIVE</option>
+                        <option value="01 63A DEFECTIVE">01 63A DEFECTIVE</option>
+                    </select>
+        </div>
+        <div>
+          <label for="pantrykitchenmcbInput" class="block text-gray-700 font-medium mb-1">Pantry Kitchen MCB:</label>
+          <select name="pantrykitchenmcb" id="pantrykitchenmcbInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="OK">OK</option>
+                        <option value="BURNER1 MCB DEFECTIVE">BURNER1 MCB DEFECTIVE</option>
+                        <option value="BURNER2 MCB DEFECTIVE">BURNER2 MCB DEFECTIVE</option>
+                        <option value="BURNER3 MCB DEFECTIVE">BURNER3 MCB DEFECTIVE</option>
+                        <option value="HOTCASE MCB DEFECTIVE">HOTCASE MCB DEFECTIVE</option>
+                        
+                    </select>
+        </div>
+      </div>
+
+      <div id="groupCFields" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 conditional-field">
+        <div>
+          <label for="aengineInput" class="block text-gray-700 font-medium mb-1">A ENGINE:</label>
+          <select name="aengine" id="aengineInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="bengineInput" class="block text-gray-700 font-medium mb-1">B ENGINE:</label>
+          <select name="bengine" id="bengineInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                    </select>
+
+        </div>
+      </div>
+
+      <div id="groupBFields" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 conditional-field">
+        <div>
+          <label for="hogInput" class="block text-gray-700 font-medium mb-1">HOG:</label>
+          <select name="hog" id="hogInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="BOTH OK">BOTH OK</option>
+                        <option value="ONLY A OK">ONLY A OK</option>
+                        <option value="ONLY B OK">ONLY B OK</option>
+                        <option value="BOTH DEFECTIVE">BOTH DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="taillampInput" class="block text-gray-700 font-medium mb-1">TAIL LAMP:</label>
+          <select name="taillamp" id="taillampInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Status</option>
+                        <option value="OK">OK</option>
+                        <option value="DEFECTIVE">DEFECTIVE</option>
+                        <option value="NOT BLINKING">NOT BLINKING</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="ramodeInput" class="block text-gray-700 font-medium mb-1">RA MODE:</label>
+          <select name="ramode" id="ramodeInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Status</option>
+                        <option value="BOTH OK">BOTH OK</option>
+                        <option value="ONLY A OK">ONLY A OK</option>
+                        <option value="ONLY B OK">ONLY B OK</option>
+                        <option value="BOTH DEFECTIVE">BOTH DEFECTIVE</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="couplersafetychainInput" class="block text-gray-700 font-medium mb-1">COUPLER SAFETY CHAIN:</label>
+          <select name="couplersafetychain" id="couplersafetychainInput" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+<option value="">Select Status</option>
+                        <option value="BOTH PROVIDED">BOTH PROVIDED</option>
+                        <option value="ONLY ONE PROVIDED">ONLY ONE PROVIDED</option>
+                    </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="anyequiepmentreplacedInput" class="block text-gray-700 font-medium mb-1">EQUIPMENT REPLACED?:</label>
+        <select name="anyequiepmentreplaced" id="anyequiepmentreplacedInput" class="w-short px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Status</option>
+                    <option value="yes">YES</option>
+                    <option value="no">NO</option>
+                    
+                </select>
+      </div>
+
+      <div id="groupEFields" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 conditional-field">
+        <div>
+          <label for="replacement1Input" class="block text-gray-700 font-medium mb-1">REPLACEMENT1:</label>
+          <select name="replacement1" id="replacement1Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Equiepment</option>
+                        <option value="CD">CD</option>
+                        <option value="CD WITH BLADE">CDWITH BLADE</option>
+                        <option value="FAN BLADE">FAN BLADE</option>
+                        <option value="CP">CP</option>
+                        <option value="BLOWER">BLOWER</option>
+                        <option value="BLOWER RUNNER">BLOWER RUNNER</option>
+                        <option value="BLOWER WITH RUNNER">BLOWER WITH RUNNER</option>
+                        <option value="PUMP">PUMP</option>
+                        <option value="MMR">MMR</option>
+                        <option value="BLOWER WIRE">BLOWER WIRE</option>
+                        <option value="MICROPROCESSOR">MICROPROCESSOR</option>
+                        <option value="MICROPROCESSOR DISPLAY">MICROPROCESSOR DISPLAY</option>
+                        <option value="TAIL LAMP">TAIL LAMP</option>
+                        <option value="K44/K46">K44/K46</option>
+                        <option value="K01/K02">K01/K02</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="replacement2Input" class="block text-gray-700 font-medium mb-1">REPLACEMENT2:</label>
+          <select name="replacement2" id="replacement2Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Equiepment</option>
+                        <option value="CD">CD</option>
+                        <option value="CD WITH BLADE">CDWITH BLADE</option>
+                        <option value="FAN BLADE">FAN BLADE</option>
+                        <option value="CP">CP</option>
+                        <option value="BLOWER">BLOWER</option>
+                        <option value="BLOWER RUNNER">BLOWER RUNNER</option>
+                        <option value="BLOWER WITH RUNNER">BLOWER WITH RUNNER</option>
+                        <option value="PUMP">PUMP</option>
+                        <option value="MMR">MMR</option>
+                        <option value="BLOWER WIRE">BLOWER WIRE</option>
+                        <option value="MICROPROCESSOR">MICROPROCESSOR</option>
+                        <option value="MICROPROCESSOR DISPLAY">MICROPROCESSOR DISPLAY</option>
+                        <option value="TAIL LAMP">TAIL LAMP</option>
+                        <option value="K44/K46">K44/K46</option>
+                        <option value="K01/K02">K01/K02</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="replacement3Input" class="block text-gray-700 font-medium mb-1">REPLACEMENT3:</label>
+          <select name="replacement3" id="replacement3Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Equiepment</option>
+                        <option value="CD">CD</option>
+                        <option value="CD WITH BLADE">CDWITH BLADE</option>
+                        <option value="FAN BLADE">FAN BLADE</option>
+                        <option value="CP">CP</option>
+                        <option value="BLOWER">BLOWER</option>
+                        <option value="BLOWER RUNNER">BLOWER RUNNER</option>
+                        <option value="BLOWER WITH RUNNER">BLOWER WITH RUNNER</option>
+                        <option value="PUMP">PUMP</option>
+                        <option value="MMR">MMR</option>
+                        <option value="BLOWER WIRE">BLOWER WIRE</option>
+                        <option value="MICROPROCESSOR">MICROPROCESSOR</option>
+                        <option value="MICROPROCESSOR DISPLAY">MICROPROCESSOR DISPLAY</option>
+                        <option value="TAIL LAMP">TAIL LAMP</option>
+                        <option value="K44/K46">K44/K46</option>
+                        <option value="K01/K02">K01/K02</option>
+                    </select>
+
+        </div>
+        <div>
+          <label for="replacement4Input" class="block text-gray-700 font-medium mb-1">REPLACEMENT4:</label>
+          <select name="replacement4" id="replacement4Input" class="w-full px-4 py-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+ <option value="">Select Equiepment</option>
+                        <option value="CD">CD</option>
+                        <option value="CD WITH BLADE">CDWITH BLADE</option>
+                        <option value="FAN BLADE">FAN BLADE</option>
+                        <option value="CP">CP</option>
+                        <option value="BLOWER">BLOWER</option>
+                        <option value="BLOWER RUNNER">BLOWER RUNNER</option>
+                        <option value="BLOWER WITH RUNNER">BLOWER WITH RUNNER</option>
+                        <option value="PUMP">PUMP</option>
+                        <option value="MMR">MMR</option>
+                        <option value="BLOWER WIRE">BLOWER WIRE</option>
+                        <option value="MICROPROCESSOR">MICROPROCESSOR</option>
+                        <option value="MICROPROCESSOR DISPLAY">MICROPROCESSOR DISPLAY</option>
+                        <option value="TAIL LAMP">TAIL LAMP</option>
+                        <option value="K44/K46">K44/K46</option>
+                        <option value="K01/K02">K01/K02</option>
+                    </select>
+
+        </div>
+      </div>
+
+      <div>
+        <label for="workpendingfornexttripInput" class="block text-gray-700 font-medium mb-1">WORK PENDING FOR NEXT TRIP</label>
+        <textarea id="workpendingfornexttripInput" name="workpendingfornexttrip" rows="3" placeholder="Please fill pending work details for next trip, if any..." class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+      </div>
+
+      <div class="flex space-x-4 mt-6">
+        <button type="submit" id="submitBtn" class="flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors duration-300">
+          Submit
+        </button>
+        <button type="button" id="updateBtn" class="flex-1 bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition-colors duration-300 hidden">
+          Update
+        </button>
+        <button type="button" id="resetBtn" class="flex-1 bg-red-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-600 transition-colors duration-300">
+          Reset
+        </button>
+      </div>
+    </form>
+    <div id="latestInfo" class="mt-4 text-center text-gray-600 font-italic"></div><br>
+    <div id="messageBox" class="mt-4 p-3 rounded-md text-center hidden"></div>
+    <div class="watermark">Designed  @ Surendra Kumar<BR>  (SSE/AC/SRC)</div>
+  </section>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyj95fNJdlNbvlMRWQhDrEIECuX4q0tD5fhooHIxgMyKwhpHOlF5TF9TlLiSvtIWeUkhQ/exec';
+
+    const entryForm = document.getElementById("entryForm");
+    const updateBtn = document.getElementById("updateBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const rowIndexInput = document.getElementById("rowIndex");
+    const coachtypeInput = document.getElementById("coachtypeInput");
+    const anyequiepmentreplacedInput = document.getElementById("anyequiepmentreplacedInput");
+
+    // Helper function to create formData with only visible fields
+    function createFormDataWithVisibleFields(action) {
+      const allFormElements = entryForm.elements;
+      const formData = new FormData();
+
+      // Always include these fields
+      formData.append('action', action);
+      formData.append('rowIndex', rowIndexInput.value);
+      
+      // Iterate through all form elements
+      for (let i = 0; i < allFormElements.length; i++) {
+        const element = allFormElements[i];
+        
+        // Skip hidden inputs and buttons, as they're handled separately
+        if (element.type === 'hidden' || element.tagName === 'BUTTON') {
+            continue;
+        }
+
+        const name = element.name;
+        // Check if the element is part of a currently visible group or is a base field
+        if (element.closest('.conditional-field')) {
+          if (element.closest('.conditional-field').style.display === 'grid') {
+            formData.append(name, element.value || '');
+          } else {
+            formData.append(name, '');
+          }
+        } else {
+          // These are the base fields that are always visible
+          formData.append(name, element.value || '');
+        }
+      }
+
+      return formData;
+    }
+
+    entryForm.addEventListener("submit", e => {
+      e.preventDefault();
+      // Use the new helper function to get only visible data
+      const formData = createFormDataWithVisibleFields('submit');
+      fetch(scriptURL, { method: 'POST', body: formData })
+        .then(response => response.text())
+        .then(msg => {
+          alert("Submitted successfully!");
+          resetForm();
+          document.getElementById("latestInfo").innerText = "";
+ document.getElementById("latestInfo1").innerText = "";
+        })
+        .catch(error => {
+          alert("Error occurred.");
+          console.error(error);
+        });
+    });
+
+    updateBtn.addEventListener("click", () => {
+      if (!rowIndexInput.value) {
+        alert("No entry selected for update.");
+        return;
+      }
+      // Use the new helper function to get only visible data
+      const formData = createFormDataWithVisibleFields('update');
+      fetch(scriptURL, { method: 'POST', body: formData })
+        .then(response => response.text())
+        .then(msg => {
+          alert("Updated successfully!");
+          resetForm();
+          document.getElementById("latestInfo").innerText = "";
+ 	  document.getElementById("latestInfo1").innerText = "";
+        })
+        .catch(error => {
+          alert("Error occurred during update.");
+          console.error(error);
+        });
+    });
+
+    resetBtn.addEventListener("click", () => {
+      resetForm();
+      document.getElementById("latestInfo").innerText = "";
+      document.getElementById("latestInfo1").innerText = "";
+    });
+
+    function resetForm() {
+      entryForm.reset();
+      rowIndexInput.value = "";
+      updateBtn.style.display = 'none';
+      submitBtn.style.display = 'block';
+      toggleFields();
+    }
+
+    function resetFormExceptCoach() {
+      const coachValue = document.getElementById("coachInput").value;
+      entryForm.reset();
+      document.getElementById("coachInput").value = coachValue;
+      rowIndexInput.value = "";
+      updateBtn.style.display = 'none';
+      submitBtn.style.display = 'block';
+      toggleFields();
+    }
+      
+    coachtypeInput.addEventListener("change", toggleFields);
+    anyequiepmentreplacedInput.addEventListener("input", toggleFields);
+      
+    function toggleFields() {
+      const coachtype = coachtypeInput.value;
+      const anyequiepmentreplaced = anyequiepmentreplacedInput.value.toLowerCase().trim();
+      
+      const groupAFields = document.getElementById('groupAFields');
+      const groupBFields = document.getElementById('groupBFields');
+      const groupCFields = document.getElementById('groupCFields');
+      const groupDFields = document.getElementById('groupDFields');
+      const groupEFields = document.getElementById('groupEFields');
+
+      groupAFields.style.display = (coachtype === 'lwcbac') ? 'grid' : 'none';
+      groupBFields.style.display = (coachtype === 'lwlrrm' || coachtype === 'lslrd') ? 'grid' : 'none';
+      groupCFields.style.display = (coachtype === 'lwlrrm') ? 'grid' : 'none';
+      groupDFields.style.display = (coachtype !== 'lslrd') ? 'grid' : 'none';
+      groupEFields.style.display = (anyequiepmentreplaced === 'yes') ? 'grid' : 'none';
+    }
+      
+    document.addEventListener('DOMContentLoaded', toggleFields);
+
+    function fetchLatestEntry() {
+document.getElementById("latestInfo").innerText = "";
+ document.getElementById("latestInfo1").innerText = "";
+
+      const coach = document.getElementById("coachInput").value.trim();
+      if (!coach) {
+        alert("Enter coach number to search.");
+        return;
+      }
+
+      fetch(`${scriptURL}?action=search&coach=${encodeURIComponent(coach)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (!data || !data.rowIndex) {
+            document.getElementById("latestInfo1").innerText = `Sorry, No previous entry found for coach ${coach}`;
+            resetFormExceptCoach();
+            return;
+          }
+
+          // Populate the form with fetched data
+          const date = new Date(data.date);
+          const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+          document.getElementById("dateInput").value = localDate.toISOString().split('T')[0];
+          document.getElementById("trainInput").value = data.train || '';
+          document.getElementById("useridInput").value = data.userid || '';
+          document.getElementById("coachtypeInput").value = data.coachtype || '';
+          document.getElementById("arrivalreportInput").value = data.arrivalreport || '';
+          document.getElementById("actiontakenInput").value = data.actiontaken || '';
+          document.getElementById("k01Input").value = data.k01 || '';
+          document.getElementById("k02Input").value = data.k02 || '';
+          document.getElementById("k44Input").value = data.k44 || '';
+          document.getElementById("fuse125aInput").value = data.fuse125a || '';
+          document.getElementById("fuse100aInput").value = data.fuse100a || '';
+          document.getElementById("rbcebcInput").value = data.rbcebc || '';
+          document.getElementById("ductInput").value = data.duct || '';
+          document.getElementById("ductstatusInput").value = data.ductstatus || '';
+          document.getElementById("mmrInput").value = data.mmr || '';
+          document.getElementById("k46Input").value = data.k46 || '';
+          document.getElementById("hotcaseInput").value = data.hotcase || '';
+          document.getElementById("fridgeInput").value = data.fridge || '';
+          document.getElementById("deepfridgeInput").value = data.deepfridge || '';
+          document.getElementById("bottlecoolerInput").value = data.bottlecooler || '';
+          document.getElementById("boilerInput").value = data.boiler || '';
+          document.getElementById("insectkillerInput").value = data.insectkiller || '';
+          document.getElementById("chimneyInput").value = data.chimney || '';
+          document.getElementById("chimneyfilterInput").value = data.chimneyfilter || '';
+          document.getElementById("fdsspantryInput").value = data.fdsspantry || '';
+          document.getElementById("pantrypanelmcbInput").value = data.pantrypanelmcb || '';
+          document.getElementById("pantrykitchenmcbInput").value = data.pantrykitchenmcb || '';
+          document.getElementById("aengineInput").value = data.aengine || '';
+          document.getElementById("bengineInput").value = data.bengine || '';
+          document.getElementById("hogInput").value = data.hog || '';
+          document.getElementById("taillampInput").value = data.taillamp || '';
+          document.getElementById("ramodeInput").value = data.ramode || '';
+          document.getElementById("couplersafetychainInput").value = data.couplersafetychain || '';
+          document.getElementById("anyequiepmentreplacedInput").value = data.anyequiepmentreplaced || '';
+          document.getElementById("replacement1Input").value = data.replacement1 || '';
+          document.getElementById("replacement2Input").value = data.replacement2 || '';
+          document.getElementById("replacement3Input").value = data.replacement3 || '';
+          document.getElementById("replacement4Input").value = data.replacement4 || '';
+          document.getElementById("workpendingfornexttripInput").value = data.workpendingfornexttrip || '';
+
+          rowIndexInput.value = data.rowIndex;
+
+          document.getElementById("latestInfo").innerText =
+            `Last entry found for coach ${coach}: Date ${localDate.toISOString().split('T')[0]}`;
+          updateBtn.style.display = 'block';
+          submitBtn.style.display = 'none';
+          toggleFields();
+        })
+        .catch(error => {
+          console.error("Search failed", error);
+          alert("Failed to fetch latest entry.");
+        });
+    }
+  </script>
+
+</body>
+</html>
